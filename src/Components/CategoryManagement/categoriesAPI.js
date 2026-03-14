@@ -34,6 +34,22 @@ export const fetchSubCategory = createAsyncThunk(
   },
 );
 
+export const fetchSubSubCategory = createAsyncThunk(
+  "category/fetchSubSubCategory",
+  async (subCategoryId, thunkAPI) => {
+    try {
+      const response = await axios.get(
+        `${BASEURL}/api/get-sub-subCategories/${subCategoryId}`,
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch sub-sub-categories.",
+      );
+    }
+  },
+);
+
 // Async thunk for creating a new category
 export const createCategory = createAsyncThunk(
   "category/createCategory",
@@ -67,6 +83,25 @@ export const createSubCategory = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Failed to create sub-category.",
+      );
+    }
+  },
+);
+
+// Async thunk for creating a new sub-sub-category
+export const createSubSubCategory = createAsyncThunk(
+  "category/createSubSubCategory",
+  async (formData, thunkAPI) => {
+    try {
+      const response = await axios.post(
+        `${BASEURL}/api/create-sub-subCategory`, // make sure BASEURL is defined
+        formData,
+        getAuthHeaders(thunkAPI),
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to create sub-sub-category.",
       );
     }
   },
@@ -112,6 +147,26 @@ export const updateSubCategory = createAsyncThunk(
   },
 );
 
+// Async thunk for updating sub-category data
+export const updateSubSubCategory = createAsyncThunk(
+  "category/updateSubSubCategory",
+  async ({ id, data }, thunkAPI) => {
+    // remove rejectWithValue from third parameter
+    try {
+      const response = await axios.put(
+        `${BASEURL}/api/update-sub-subCategory/${id}`,
+        data,
+        getAuthHeaders(thunkAPI),
+      );
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to update sub-category.",
+      ); // Use rejectWithValue from thunkAPI
+    }
+  },
+);
+
 // Async thunk for deleteCategory
 export const deleteCategory = createAsyncThunk(
   "category/deleteCategory",
@@ -141,6 +196,23 @@ export const deleteSubCategory = createAsyncThunk(
     } catch (error) {
       // Reject with value if the request fails
       return thunkAPI.rejectWithValue("Failed to delete sub-category.");
+    }
+  },
+);
+
+// Async thunk for deleteSubSubCategory
+export const deleteSubSubCategory = createAsyncThunk(
+  "category/deleteSubSubCategory",
+  async (id, thunkAPI) => {
+    try {
+      const res = await axios.delete(
+        `${BASEURL}/api/delete-sub-subCategory/${id}`,
+        getAuthHeaders(thunkAPI), // Ensure headers are passed correctly
+      );
+      return res.data;
+    } catch (error) {
+      // Reject with value if the request fails
+      return thunkAPI.rejectWithValue("Failed to delete sub-sub-category.");
     }
   },
 );

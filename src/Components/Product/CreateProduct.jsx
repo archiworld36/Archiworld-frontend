@@ -60,9 +60,7 @@ export default function CreateProductForm() {
   const [images, setImages] = useState([{ file: null }]);
   const [features, setFeatures] = useState([{ value: "" }]);
 
-  const [catalogues, setCatalogues] = useState([
-    { type: "", bannerImage: null, pdfFile: null },
-  ]);
+  const [catalogues, setCatalogues] = useState([]);
 
   useEffect(() => {
     if (location === "/create-product") {
@@ -739,7 +737,17 @@ export default function CreateProductForm() {
                       onChange={(e) => {
                         const file = e.target.files[0];
                         if (!file) return;
-
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (file.type !== "application/pdf") {
+                          toast.info("Only PDF files are allowed");
+                          e.target.value = "";
+                          return;
+                        }
+                        if (file.size > maxSize) {
+                          toast.info("PDF must be less than 5MB");
+                          e.target.value = "";
+                          return;
+                        }
                         setCatalogues((prev) =>
                           prev.map((c, i) =>
                             i === idx ? { ...c, pdfFile: file } : c,
@@ -747,7 +755,9 @@ export default function CreateProductForm() {
                         );
                       }}
                     />
-                    <span className="text-xs text-gray-500">Upload PDF</span>
+                    <span className="text-xs text-gray-500">
+                      Upload PDF (Size max upto 5MB)
+                    </span>
                   </div>
                   {/* PDF Preview */}
                   {item.pdfFile && (

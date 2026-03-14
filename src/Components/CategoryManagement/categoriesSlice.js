@@ -9,11 +9,16 @@ import {
   updateSubCategory,
   deleteCategory,
   deleteSubCategory,
+  fetchSubSubCategory,
+  createSubSubCategory,
+  updateSubSubCategory,
+  deleteSubSubCategory,
 } from "./categoriesAPI";
 
 export const initialState = {
   categories: [],
   subCategories: [],
+  subSubCategories: [],
   loading: false,
   error: null,
 };
@@ -50,6 +55,19 @@ const categorySlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      // Fetch sub-sub-categories
+      .addCase(fetchSubSubCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubSubCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subSubCategories = action.payload; // Set the list of subCategories
+      })
+      .addCase(fetchSubSubCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
       // Create new category
       .addCase(createCategory.pending, (state) => {
         state.loading = true;
@@ -73,6 +91,18 @@ const categorySlice = createSlice({
       .addCase(createSubCategory.rejected, (state, action) => {
         state.loading = false;
       })
+      //create new sub-category
+      .addCase(createSubSubCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createSubSubCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subSubCategories.push(action.payload); // Add the new sub-category to the list
+      })
+      .addCase(createSubSubCategory.rejected, (state, action) => {
+        state.loading = false;
+      })
       // Update category
       .addCase(updateCategory.pending, (state) => {
         state.loading = true;
@@ -82,8 +112,8 @@ const categorySlice = createSlice({
         state.loading = false;
         const updatedCategory = action.payload.data;
         state.categories = state.categories.map((cat) =>
-          cat._id === updatedCategory._id ? updatedCategory : cat
-        );      
+          cat._id === updatedCategory._id ? updatedCategory : cat,
+        );
         state.success = "Category updated successfully.";
       })
       .addCase(updateCategory.rejected, (state, action) => {
@@ -98,15 +128,33 @@ const categorySlice = createSlice({
         state.loading = false;
         const updatedCategory = action.payload.data;
         state.subCategories = state.subCategories.map((subCat) =>
-          subCat._id === updatedCategory._id ? updatedCategory : subCat
-        );   
+          subCat._id === updatedCategory._id ? updatedCategory : subCat,
+        );
         state.success = "Sub-category updated successfully.";
       })
       .addCase(updateSubCategory.rejected, (state, action) => {
         state.loading = false;
       })
-       // delete category
-       .addCase(deleteCategory.pending, (state) => {
+      // Update sub-category
+      .addCase(updateSubSubCategory.pending, (state) => {
+        state.loading = true;
+        state.success = null;
+      })
+      .addCase(updateSubSubCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedSubCategory = action.payload.data;
+        state.subSubCategories = state.subSubCategories.map((subSubCat) =>
+          subSubCat._id === updatedSubCategory._id
+            ? updatedSubCategory
+            : subSubCat,
+        );
+        state.success = "Sub-Sub-category updated successfully.";
+      })
+      .addCase(updateSubSubCategory.rejected, (state, action) => {
+        state.loading = false;
+      })
+      // delete category
+      .addCase(deleteCategory.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = null;
@@ -114,13 +162,15 @@ const categorySlice = createSlice({
       .addCase(deleteCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.success = "Category deleted successfully.";
-        state.categories = state.categories.filter((cat) => cat._id !== action.payload.id);
+        state.categories = state.categories.filter(
+          (cat) => cat._id !== action.payload.id,
+        );
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-       // delete sub-category
+      // delete sub-category
       .addCase(deleteSubCategory.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -129,9 +179,28 @@ const categorySlice = createSlice({
       .addCase(deleteSubCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.success = "Sub-category deleted successfully.";
-        state.subCategories = state.subCategories.filter((subCat) => subCat._id !== action.payload.id);
+        state.subCategories = state.subCategories.filter(
+          (subCat) => subCat._id !== action.payload.id,
+        );
       })
       .addCase(deleteSubCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // delete sub-sub-category
+      .addCase(deleteSubSubCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
+      })
+      .addCase(deleteSubSubCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = "Sub-Sub-category deleted successfully.";
+        state.subSubCategories = state.subSubCategories.filter(
+          (subSubCat) => subSubCat._id !== action.payload.id,
+        );
+      })
+      .addCase(deleteSubSubCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

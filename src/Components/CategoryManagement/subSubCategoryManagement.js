@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchSubCategory,
-  createSubCategory,
-  updateSubCategory,
-  deleteSubCategory,
+  createSubSubCategory,
+  deleteSubSubCategory,
+  fetchSubSubCategory,
+  updateSubSubCategory,
 } from "./categoriesAPI";
 import { toast } from "react-toastify";
 import { Button } from "../../ui/buttons";
@@ -18,7 +18,7 @@ import {
 } from "../../ui/table";
 import { InputText } from "primereact/inputtext";
 import { Edit, Trash2, Plus, AlertCircle, ArrowLeft } from "lucide-react";
-import { useLocation, useParams } from "wouter";
+import { useParams } from "wouter";
 import {
   Card,
   CardContent,
@@ -35,64 +35,63 @@ import {
   DialogTitle,
 } from "../../ui/dialog";
 
-export default function SubCategoryManagement() {
+export default function SubSubCategoryManagement() {
   const dispatch = useDispatch();
-  const { categoryId, name } = useParams();
+  const { name, subCategoryId } = useParams();
   const {
-    subCategories = [],
+    subSubCategories = [],
     loading,
     error,
   } = useSelector((state) => state.category);
   const [isAdding, setIsAdding] = useState(false);
-  const [editingSubCategory, setEditingSubCategory] = useState(null);
+  const [editingSubSubCategory, setEditingSubSubCategory] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
-  const [newSubCategory, setNewSubCategory] = useState("");
+  const [subSubCategoryToDelete, setSubSubCategoryToDelete] = useState(null);
+  const [newSubSubCategory, setNewSubSubCategory] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
-  const [, navigate] = useLocation();
 
-  const fetchSubCategoriesOnce = useCallback(() => {
-    dispatch(fetchSubCategory(categoryId));
-  }, [dispatch, categoryId]);
+  const fetchSubSubCategoriesOnce = useCallback(() => {
+    dispatch(fetchSubSubCategory(subCategoryId));
+  }, [dispatch, subCategoryId]);
 
   // 👇 useEffect will only run once and call the fetch function
   useEffect(() => {
-    fetchSubCategoriesOnce();
-  }, [fetchSubCategoriesOnce]);
+    fetchSubSubCategoriesOnce();
+  }, [fetchSubSubCategoriesOnce]);
 
   const handleDeleteClick = (item) => {
-    setSubCategoryToDelete(item);
+    setSubSubCategoryToDelete(item);
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (subCategoryToDelete) {
+    if (subSubCategoryToDelete) {
       try {
         const actionResult = await dispatch(
-          deleteSubCategory(subCategoryToDelete._id),
+          deleteSubSubCategory(subSubCategoryToDelete._id),
         );
-        if (deleteSubCategory.rejected.match(actionResult)) {
+        if (deleteSubSubCategory.rejected.match(actionResult)) {
           toast.error(actionResult.payload || "Something went wrong");
         } else {
-          toast.success("Category deleted successfully!");
+          toast.success("Sub-Sub-Category deleted successfully!");
           setDeleteDialogOpen(false);
-          setSubCategoryToDelete(null);
+          setSubSubCategoryToDelete(null);
         }
       } catch (error) {
         console.error("Error deleting category:", error);
-        toast.error("An error occurred while deleting the category.");
+        toast.error("An error occurred while deleting the sub-sub-category.");
       }
     }
   };
 
   const handleSave = async () => {
-    if (!newSubCategory.trim()) {
+    if (!newSubSubCategory.trim()) {
       toast.error("Please enter sub-category name");
       return;
     }
     const formData = new FormData();
-    formData.append("name", newSubCategory);
-    formData.append("categoryId", categoryId);
+    formData.append("name", newSubSubCategory);
+    formData.append("subCategoryId", subCategoryId);
 
     if (bannerImage) {
       formData.append("bannerImage", bannerImage);
@@ -100,31 +99,31 @@ export default function SubCategoryManagement() {
 
     let result;
 
-    if (editingSubCategory) {
+    if (editingSubSubCategory) {
       result = await dispatch(
-        updateSubCategory({ id: editingSubCategory._id, data: formData }),
+        updateSubSubCategory({ id: editingSubSubCategory._id, data: formData }),
       );
 
-      if (updateSubCategory.rejected.match(result)) {
+      if (updateSubSubCategory.rejected.match(result)) {
         toast.error(result.payload);
         return;
       }
 
-      toast.success("Sub-category updated");
+      toast.success("Sub-Sub-category updated");
     } else {
-      result = await dispatch(createSubCategory(formData));
+      result = await dispatch(createSubSubCategory(formData));
 
-      if (createSubCategory.rejected.match(result)) {
+      if (createSubSubCategory.rejected.match(result)) {
         toast.error(result.payload);
         return;
       }
 
-      toast.success("Sub-category added");
+      toast.success("Sub-Sub-category added");
     }
 
-    setNewSubCategory("");
+    setNewSubSubCategory("");
     setIsAdding(false);
-    setEditingSubCategory(null);
+    setEditingSubSubCategory(null);
   };
 
   return (
@@ -142,30 +141,30 @@ export default function SubCategoryManagement() {
           </Button>
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
-              Sub-Category of {name}
+              Sub-Sub-Category of {name}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              Manage your sub-categoies effectively.
+              Manage your sub-sub-categoies effectively.
             </p>
           </div>
         </div>
         <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Sub Category
+          Add Sub Sub Category
         </Button>
       </div>
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle>Product Sub-Categories List</CardTitle>
+          <CardTitle>Product Sub-Sub-Categories List</CardTitle>
           <CardDescription>
-            View and Manage sub-categories option
+            View and Manage sub-sub-categories option
           </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="w-full text-center py-10">
               <p className="mt-2 text-sm text-gray-600">
-                Loading sub-categories...
+                Loading sub-sub-categories...
               </p>
             </div>
           ) : error ? (
@@ -175,14 +174,14 @@ export default function SubCategoryManagement() {
                 Error: {error}
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                There was an error fetching sub-categories. Please try again
+                There was an error fetching sub-sub-categories. Please try again
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Sub-Category Name</TableHead>
+                  <TableHead>Sub-Sub-Category Name</TableHead>
                   <TableHead>Banner Image</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -195,8 +194,8 @@ export default function SubCategoryManagement() {
                         type="text"
                         className="w-full border py-2 px-3 text-start border-gray-300 rounded-md shadow-none text-sm"
                         placeholder="Enter Category Name"
-                        value={newSubCategory}
-                        onChange={(e) => setNewSubCategory(e.target.value)}
+                        value={newSubSubCategory}
+                        onChange={(e) => setNewSubSubCategory(e.target.value)}
                       />
                     </TableCell>
                     <TableCell>
@@ -216,8 +215,8 @@ export default function SubCategoryManagement() {
                       <Button
                         onClick={() => {
                           setIsAdding(false);
-                          setNewSubCategory("");
-                          setEditingSubCategory(null);
+                          setNewSubSubCategory("");
+                          setEditingSubSubCategory(null);
                           setBannerImage(null);
                         }}
                         variant="outline"
@@ -228,20 +227,11 @@ export default function SubCategoryManagement() {
                     </TableCell>
                   </TableRow>
                 )}
-                {subCategories
-                  .filter((item) => item._id !== editingSubCategory?._id)
+                {subSubCategories
+                  .filter((item) => item._id !== editingSubSubCategory?._id)
                   .map((item, index) => (
                     <TableRow key={index}>
-                      <TableCell
-                        className="font-medium text-blue-600 cursor-pointer hover:underline"
-                        onClick={() =>
-                          navigate(
-                            `/category-management/${name}/${categoryId}/${item._id}`,
-                          )
-                        }
-                      >
-                        {item.name}
-                      </TableCell>
+                      <TableCell>{item.name}</TableCell>
                       <TableCell>
                         {item.bannerImage && (
                           <a
@@ -260,8 +250,8 @@ export default function SubCategoryManagement() {
                           size="sm"
                           className="h-8 w-8 p-0"
                           onClick={() => {
-                            setEditingSubCategory(item);
-                            setNewSubCategory(item.name);
+                            setEditingSubSubCategory(item);
+                            setNewSubSubCategory(item.name);
                             setIsAdding(true);
                           }}
                         >
@@ -289,8 +279,8 @@ export default function SubCategoryManagement() {
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete the Order Number{" "}
-              {subCategoryToDelete ? `${subCategoryToDelete.name}` : ""} ? This
-              action cannot be undone.
+              {subSubCategoryToDelete ? `${subSubCategoryToDelete.name}` : ""} ?
+              This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

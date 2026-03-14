@@ -8,7 +8,7 @@ import {
 } from "../../ui/Card";
 import { useDispatch, useSelector } from "react-redux";
 
-import { AlertCircle, Edit, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Edit, Plus, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -142,11 +142,22 @@ export default function CategoryManagement() {
   return (
     <div className="w-full">
       <div className="flex flex-col gap-2 lg:flex-row justify-between lg:items-center mb-6">
-        <div className="w-full">
-          <h1 className="text-2xl font-semibold text-gray-900">Category</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your all categoies effectively.
-          </p>
+        <div className="flex items-center mb-6">
+          <Button
+            onClick={() => window.history.back()}
+            variant="ghost"
+            size="sm"
+            className="mr-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Category</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your all categoies effectively.
+            </p>
+          </div>
         </div>
         <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
           <Plus className="mr-2 h-4 w-4" />

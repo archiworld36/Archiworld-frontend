@@ -14,6 +14,7 @@ import BrandOptions from "./Components/BrandOptions/brandOptions";
 import MaterialOptions from "./Components/MaterialOptions/materialOptions";
 import CreateProductForm from "./Components/Product/CreateProduct";
 import ProductManagement from "./Components/Product/ProductManagement";
+import SubSubCategoryManagement from "./Components/CategoryManagement/subSubCategoryManagement";
 
 function App() {
   useAutoLogout();
@@ -53,6 +54,10 @@ function App() {
         <Route
           path="/category-management/:name/:categoryId"
           component={withAuth(SubCategoryManagement, { adminOnly: true })}
+        />
+        <Route
+          path="/category-management/:name/:categoryId/:subCategoryId"
+          component={withAuth(SubSubCategoryManagement, { adminOnly: true })}
         />
         {/* User Route */}
         <Route

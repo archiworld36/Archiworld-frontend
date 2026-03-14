@@ -943,6 +943,17 @@ export default function CreateUser() {
                         onChange={(e) => {
                           const file = e.target.files[0];
                           if (!file) return;
+                          const maxSize = 5 * 1024 * 1024; // 5MB
+                          if (file.type !== "application/pdf") {
+                            toast.info("Only PDF files are allowed.");
+                            e.target.value = "";
+                            return;
+                          }
+                          if (file.size > maxSize) {
+                            toast.info("File size must be less than 5MB.");
+                            e.target.value = "";
+                            return;
+                          }
                           setCatalogues((prev) =>
                             prev.map((c, i) =>
                               i === idx ? { ...c, pdf: file } : c,
@@ -950,7 +961,9 @@ export default function CreateUser() {
                           );
                         }}
                       />
-                      <span className="text-xs text-gray-500">Upload PDF</span>
+                      <span className="text-xs text-gray-500">
+                        Upload PDF (Size max upto 5MB)
+                      </span>
                     </div>
                     {typeof item.pdf === "string" && (
                       <a
