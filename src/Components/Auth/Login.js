@@ -3,10 +3,10 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   login,
-  resendOTP,
-  sendOTP,
-  verifyOTP,
   handleForgotPassword,
+  sendUserOTP,
+  resendUserOTP,
+  verifyUserOTP,
 } from "./authAPI";
 import logo from "../../assets/logo.png";
 import show from "../../assets/show.png";
@@ -57,12 +57,8 @@ export default function Login() {
     });
   };
 
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
   const handleAction = (email) => {
-    if (!email || !isValidEmail(email)) {
+    if (!email) {
       // show error toast / alert
       toast.error("Please enter a valid email address");
       return;
@@ -75,8 +71,8 @@ export default function Login() {
   const handleSendOTP = useCallback(
     async (email) => {
       try {
-        const actionResult = await dispatch(sendOTP({ email }));
-        if (sendOTP.fulfilled.match(actionResult)) {
+        const actionResult = await dispatch(sendUserOTP({ email }));
+        if (sendUserOTP.fulfilled.match(actionResult)) {
           toast.success("OTP sent!");
           return;
         }
@@ -91,8 +87,8 @@ export default function Login() {
   const handleReSendOTP = useCallback(
     async (email) => {
       try {
-        const actionResult = await dispatch(resendOTP({ email }));
-        if (resendOTP.fulfilled.match(actionResult)) {
+        const actionResult = await dispatch(resendUserOTP({ email }));
+        if (resendUserOTP.fulfilled.match(actionResult)) {
           toast.success("OTP re-sent!");
           return;
         }
@@ -107,8 +103,8 @@ export default function Login() {
   const handleVerifyOTP = useCallback(
     async (email, otp) => {
       try {
-        const actionResult = await dispatch(verifyOTP({ email, otp }));
-        if (verifyOTP.fulfilled.match(actionResult)) {
+        const actionResult = await dispatch(verifyUserOTP({ email, otp }));
+        if (verifyUserOTP.fulfilled.match(actionResult)) {
           toast.success("OTP verified!");
           setEmailVerfied(true);
           setDialogOpen(false);
@@ -126,7 +122,7 @@ export default function Login() {
     async (newPassword, confirmNewPassword) => {
       try {
         if (!emailVerified) {
-          toast.info("Please verify email first");
+          toast.info("Please verify user first");
           return;
         }
         if (!newPassword || !confirmNewPassword) {
@@ -181,9 +177,7 @@ export default function Login() {
             type={forgotPassword ? "email" : "text"}
             required
             disabled={emailVerified}
-            placeholder={
-              forgotPassword ? "Enter Email Id" : "Email ID or username"
-            }
+            placeholder="Email ID or username"
             className="px-4 w-full py-2 border-2 border-black rounded-sm shadow-none"
           />
           {forgotPassword && (
@@ -307,7 +301,7 @@ export default function Login() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="w-[90%] lg:max-w-[40%]">
           <DialogHeader>
-            <DialogTitle>Verfiy {email}</DialogTitle>
+            <DialogTitle>Verfiy User</DialogTitle>
             <div className="flex flex-col items-center gap-1 justify-center">
               <Label>
                 Enter OTP <span className="text-red-600">*</span>

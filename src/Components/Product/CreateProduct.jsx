@@ -20,10 +20,12 @@ import { toast } from "react-toastify";
 import {
   fetchCategory,
   fetchSubCategory,
+  fetchSubSubCategory,
 } from "../CategoryManagement/categoriesAPI";
 import { fetchBrandOptions } from "../BrandOptions/brandOptionsAPI";
 import { fetchMaterialOptions } from "../MaterialOptions/materialOptionsAPI";
 import { Link, useLocation, useParams } from "wouter";
+import { Checkbox } from "primereact/checkbox";
 
 export default function CreateProductForm() {
   const dispatch = useDispatch();
@@ -31,6 +33,7 @@ export default function CreateProductForm() {
   const { productById, loadingProductFetch, errorProductFetch } = useSelector(
     (state) => state.product,
   );
+  const { user } = useSelector((state) => state.auth);
   const fetchProductDetails = useCallback(() => {
     dispatch(fetchProductById(productId));
   }, [dispatch, productId]);
@@ -39,7 +42,9 @@ export default function CreateProductForm() {
     if (productId) fetchProductDetails();
   }, [fetchProductDetails, productId]);
   const [location, navigate] = useLocation();
-  const { categories, subCategories } = useSelector((s) => s.category);
+  const { categories, subCategories, subSubCategories } = useSelector(
+    (s) => s.category,
+  );
   const { brandOptions } = useSelector((s) => s.brandOption);
   const { materialOptions } = useSelector((s) => s.materialOption);
   const [isSaving, setIsSaving] = useState(false);
@@ -48,12 +53,14 @@ export default function CreateProductForm() {
     description: "",
     category: null,
     subCategory: null,
+    subSubCategory: null,
     brand: null,
     material: null,
     color: [],
     size: { length: "", width: "", height: "", weight: "" },
     price: { min: "", max: "" },
     features: [],
+    featuredProduct: false,
   });
 
   const [bannerImage, setBannerImage] = useState(null);
@@ -69,22 +76,29 @@ export default function CreateProductForm() {
         description: "",
         category: null,
         subCategory: null,
+        subSubCategory: null,
         brand: null,
         material: null,
         color: [],
         size: { length: "", width: "", height: "", weight: "" },
         price: { min: "", max: "" },
         features: [],
+        featuredProduct: false,
       });
     } else if (location.startsWith("/edit-product") && productById) {
       if (productById.category?._id) {
         dispatch(fetchSubCategory(productById.category._id));
+      }
+      if (productById.subCategory?._id) {
+        dispatch(fetchSubSubCategory(productById.subCategory._id));
       }
       setFormData({
         name: productById.name || "",
         description: productById.description || "",
         category: productById.category?._id || null,
         subCategory: productById.subCategory?._id || null,
+        subSubCategory: productById.subSubCategory?._id || null,
+        featuredProduct: productById.featuredProduct || false,
         brand: productById.brand?._id || null,
         material: productById.material?._id || null,
         color: productById.color?.map((item) => item) || [],
@@ -214,6 +228,9 @@ export default function CreateProductForm() {
     fd.append("description", formData.description);
     fd.append("category", formData.category);
     fd.append("subCategory", formData.subCategory);
+    if (formData.subSubCategory) {
+      fd.append("subSubCategory", formData.subSubCategory);
+    }
     fd.append("brand", formData.brand);
     fd.append("material", formData.material);
     const featureList = features.map((f) => f.value).filter(Boolean);
@@ -221,6 +238,7 @@ export default function CreateProductForm() {
     fd.append("color", JSON.stringify(formData.color));
     fd.append("size", JSON.stringify(formData.size));
     fd.append("price", JSON.stringify(formData.price));
+    fd.append("featuredProduct", JSON.stringify(formData.featuredProduct));
 
     fd.append(
       "catalogues",
@@ -284,12 +302,14 @@ export default function CreateProductForm() {
             description: "",
             category: null,
             subCategory: null,
+            subSubCategory: null,
             brand: null,
             material: null,
             color: [],
             size: { length: "", width: "", height: "", weight: "" },
             price: { min: "", max: "" },
             features: [],
+            featuredProduct: false,
           });
           navigate("/product-management");
         }
@@ -326,6 +346,18 @@ export default function CreateProductForm() {
 
   const dropdownFields = [
     {
+      key: "brand",
+      label: "Brand",
+      placeholder: "Select Brand",
+      options: brandOptions,
+    },
+    {
+      key: "material",
+      label: "Material",
+      placeholder: "Select Material",
+      options: materialOptions,
+    },
+    {
       key: "category",
       label: "Category",
       placeholder: "Select Category",
@@ -337,18 +369,15 @@ export default function CreateProductForm() {
       label: "Sub-Category",
       placeholder: "Select Sub-Category",
       options: subCategories,
-    },
-    {
-      key: "brand",
-      label: "Brand",
-      placeholder: "Select Brand",
-      options: brandOptions,
-    },
-    {
-      key: "material",
-      label: "Material",
-      placeholder: "Select Material",
-      options: materialOptions,
+      changeHandler: (e) => {
+        setFormData({
+          ...formData,
+          subCategory: e.value,
+          subSubCategory: null, // reset
+        });
+
+        dispatch(fetchSubSubCategory(e.value));
+      },
     },
   ];
   const colors = [
@@ -478,6 +507,24 @@ export default function CreateProductForm() {
                   />
                 </div>
               ))}
+
+              {subSubCategories.length > 0 && (
+                <div className="w-full flex flex-col gap-1">
+                  <Label className="px-3">Sub-Sub Category</Label>
+                  <Dropdown
+                    placeholder="Select Sub-Sub Category"
+                    options={subSubCategories.map((o) => ({
+                      label: o.name,
+                      value: o._id,
+                    }))}
+                    value={formData.subSubCategory}
+                    onChange={(e) =>
+                      setFormData({ ...formData, subSubCategory: e.value })
+                    }
+                    className="w-full px-1 text-sm border border-gray-300 rounded-md bg-input shadow-none"
+                  />
+                </div>
+              )}
               <div className="w-full flex flex-col gap-1">
                 <Label className="px-3">
                   Colors <span className="text-red-600">*</span>
@@ -839,6 +886,23 @@ export default function CreateProductForm() {
               </Button>
             </Link>
             <div className="w-fit flex flex-col lg:flex-row gap-5 items-center">
+              {user?.parentId === null && (
+                <div className="flex align-items-center">
+                  <Checkbox
+                    inputId="featuredProduct"
+                    name="featuredProduct"
+                    id="featuredProduct"
+                    onChange={(e) =>
+                      setFormData({ ...formData, featuredProduct: e.checked })
+                    }
+                    checked={formData.featuredProduct === true}
+                    className="no-shadow-panel"
+                  />
+                  <Label htmlFor="featuredProduct" className="ml-2">
+                    Feature Product
+                  </Label>
+                </div>
+              )}
               <Button type="submit" disabled={isSaving}>
                 {isSaving
                   ? productById.name

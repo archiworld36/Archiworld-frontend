@@ -22,6 +22,9 @@ import {
   sendOTP,
   updateUser,
   verifyOTP,
+  verifyPhoneOTP,
+  resendPhoneOTP,
+  sendPhoneOTP,
 } from "./authAPI";
 import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
@@ -48,6 +51,8 @@ export default function CreateUser() {
   );
   const { categories, subCategories } = useSelector((s) => s.category);
   const [availableSubCategories, setAvailableSubCategories] = useState([]);
+  const [otpType, setOtpType] = useState("email");
+  // "email" | "phone"
   const fetchUserDetails = useCallback(() => {
     if (userId) dispatch(fetchUserById(userId));
   }, [dispatch, userId]);
@@ -75,6 +80,7 @@ export default function CreateUser() {
     serviceState: [],
     about: "",
     emailVerified: false,
+    phoneVerified: false,
     subscription: null,
     profileLogo: null, // File
     bannerImage: null, // File
@@ -157,6 +163,7 @@ export default function CreateUser() {
         serviceState: [],
         about: "",
         emailVerified: false,
+        phoneVerified: false,
         subscription: null,
         profileLogo: null, // File
         bannerImage: null, // File
@@ -191,6 +198,7 @@ export default function CreateUser() {
         serviceState: userById.serviceState || [],
         about: userById.about || "",
         emailVerified: userById.emailVerified || false,
+        phoneVerified: userById.phoneVerified || false,
         subscription: userById.subscription?._id || null,
         profileLogo: userById.profileLogo || null, // File
         bannerImage: userById.bannerImage || null, // File
@@ -234,6 +242,7 @@ export default function CreateUser() {
       ...prev,
       [key]: value,
       ...(key === "email" && { emailVerified: false }),
+      ...(key === "mobile" && { phoneVerified: false }),
     }));
   };
 
@@ -374,15 +383,84 @@ export default function CreateUser() {
     [dispatch],
   );
 
-  const handleAction = (email) => {
+  const handleSendPhoneOTP = useCallback(
+    async (phoneNumber) => {
+      try {
+        const actionResult = await dispatch(sendPhoneOTP({ phoneNumber }));
+        if (sendPhoneOTP.fulfilled.match(actionResult)) {
+          toast.success("OTP sent on phone!");
+          return;
+        }
+        toast.error(actionResult.payload || "Something went wrong");
+      } catch {
+        toast.error("Error sending phone OTP");
+      }
+    },
+    [dispatch],
+  );
+
+  const handleResendPhoneOTP = useCallback(
+    async (phoneNumber) => {
+      try {
+        const actionResult = await dispatch(resendPhoneOTP({ phoneNumber }));
+        if (resendPhoneOTP.fulfilled.match(actionResult)) {
+          toast.success("OTP re-sent!");
+          return;
+        }
+        toast.error(actionResult.payload || "Something went wrong");
+      } catch {
+        toast.error("Error resending phone OTP");
+      }
+    },
+    [dispatch],
+  );
+
+  const handleVerifyPhoneOTP = useCallback(
+    async (phoneNumber, otp) => {
+      setIsSaving(true);
+      try {
+        const actionResult = await dispatch(
+          verifyPhoneOTP({ phoneNumber, otp }),
+        );
+        if (verifyPhoneOTP.fulfilled.match(actionResult)) {
+          toast.success("Phone verified!");
+          setFormData((prev) => ({
+            ...prev,
+            phoneVerified: true,
+          }));
+          setDialogOpen(false);
+          return;
+        }
+        toast.error(actionResult.payload || "Invalid OTP");
+      } catch {
+        toast.error("Error verifying OTP");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [dispatch],
+  );
+
+  const handleEmailVerifyClick = () => {
+    setOtpType("email");
     setDialogOpen(true);
-    handleSendOTP(email);
+    handleSendOTP(formData.email);
+  };
+
+  const handlePhoneVerifyClick = () => {
+    setOtpType("phone");
+    setDialogOpen(true);
+    handleSendPhoneOTP(formData.mobile);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.emailVerified) {
       toast.info("Please verify your email Id");
+      return;
+    }
+    if (!formData.phoneVerified) {
+      toast.info("Please verify your Mobile Number");
       return;
     }
     for (let i = 0; i < catalogues.length; i++) {
@@ -648,10 +726,10 @@ export default function CreateUser() {
                     <Button
                       variant={formData.emailVerified ? "green" : "default"}
                       disabled={formData.emailVerified}
-                      onClick={() => handleAction(formData.email)}
+                      onClick={handleEmailVerifyClick}
                     >
-                      {formData.emailVerified ? `Verified` : "Verify"}
-                      {formData.emailVerified ? <Verified /> : <></>}
+                      {formData.emailVerified ? "Verified" : "Verify"}
+                      {formData.emailVerified && <Verified />}
                     </Button>
                   </div>
                 </div>
@@ -659,19 +737,29 @@ export default function CreateUser() {
                   <Label className="px-3">
                     Mobile Number <span className="text-red-600">*</span>
                   </Label>
-                  <InputText
-                    required
-                    type="tel"
-                    value={formData.mobile}
-                    minLength={10}
-                    maxLength={10}
-                    onChange={(e) => {
-                      const digitsOnly = e.target.value.replace(/\D/g, ""); // Remove all non-digits
-                      handleOnChange("mobile", digitsOnly);
-                    }}
-                    placeholder="Enter Mobile Number"
-                    className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none shadow-none bg-input"
-                  />
+                  <div className="flex gap-2 items-center w-full">
+                    <InputText
+                      required
+                      type="tel"
+                      value={formData.mobile}
+                      minLength={10}
+                      maxLength={10}
+                      onChange={(e) => {
+                        const digitsOnly = e.target.value.replace(/\D/g, ""); // Remove all non-digits
+                        handleOnChange("mobile", digitsOnly);
+                      }}
+                      placeholder="Enter Mobile Number"
+                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none shadow-none bg-input"
+                    />
+                    <Button
+                      variant={formData.phoneVerified ? "green" : "default"}
+                      disabled={formData.phoneVerified}
+                      onClick={handlePhoneVerifyClick}
+                    >
+                      {formData.phoneVerified ? "Verified" : "Verify"}
+                      {formData.phoneVerified && <Verified />}
+                    </Button>
+                  </div>
                 </div>
                 <div className="w-full flex flex-col gap-1">
                   <Label className="px-3">
@@ -1067,7 +1155,9 @@ export default function CreateUser() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="w-[90%] lg:max-w-[40%]">
           <DialogHeader>
-            <DialogTitle>Verfiy {formData?.email}</DialogTitle>
+            <DialogTitle>
+              Verify {otpType === "email" ? formData.email : formData.mobile}
+            </DialogTitle>
             <div className="flex flex-col items-center gap-1 justify-center">
               <Label>
                 Enter OTP <span className="text-red-600">*</span>
@@ -1100,8 +1190,11 @@ export default function CreateUser() {
                 inputTemplate={customInput}
               />
               <button
-                onClick={() => handleReSendOTP(formData.email)}
-                className="text-primary underline-offset-4 hover:underline text-sm"
+                onClick={() =>
+                  otpType === "email"
+                    ? handleReSendOTP(formData.email)
+                    : handleResendPhoneOTP(formData.mobile)
+                }
               >
                 Resend OTP
               </button>
@@ -1119,7 +1212,11 @@ export default function CreateUser() {
                 Cancel
               </Button>
               <Button
-                onClick={() => handleVerifyOTP(formData.email, otp)}
+                onClick={() =>
+                  otpType === "email"
+                    ? handleVerifyOTP(formData.email, otp)
+                    : handleVerifyPhoneOTP(formData.mobile, otp)
+                }
                 variant="green"
                 disabled={isSaving}
               >

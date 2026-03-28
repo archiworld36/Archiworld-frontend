@@ -15,20 +15,16 @@ export const login = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Incorrect email or password."
+        error.response?.data?.message || "Incorrect email or password.",
       );
     }
-  }
+  },
 );
 
 let cancelToken;
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
-  async ({
-    searchTerm = "",
-    page = 0,
-    rows = 25,
-  }, thunkAPI) => {
+  async ({ searchTerm = "", page = 0, rows = 25 }, thunkAPI) => {
     try {
       if (cancelToken) {
         cancelToken.cancel("New request initiated, cancelling previous one");
@@ -40,26 +36,23 @@ export const fetchUsers = createAsyncThunk(
         take: rows,
       };
 
-      const response = await axios.post(
-        `${BASEURL}/api/parent`,
-        body,
-        {
-          ...getAuthHeaders(thunkAPI),
-          cancelToken: cancelToken.token,
-        });
+      const response = await axios.post(`${BASEURL}/api/parent`, body, {
+        ...getAuthHeaders(thunkAPI),
+        cancelToken: cancelToken.token,
+      });
       return {
-        users:response.data.users,
-        totalCount: response.data.totalCount
-      }
-    } catch (error){
+        users: response.data.users,
+        totalCount: response.data.totalCount,
+      };
+    } catch (error) {
       if (axios.isCancel(error)) {
         return;
       }
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to fetch orders."
+        error.response?.data?.message || "Failed to fetch orders.",
       );
     }
-  }
+  },
 );
 
 export const fetchUserById = createAsyncThunk(
@@ -67,10 +60,10 @@ export const fetchUserById = createAsyncThunk(
   async (userId, thunkAPI) => {
     const response = await axios.get(
       `${BASEURL}/api/get-user/${userId}`,
-      getAuthHeaders(thunkAPI)
+      getAuthHeaders(thunkAPI),
     );
     return response.data.users;
-  }
+  },
 );
 
 export const fetchParentUsers = createAsyncThunk(
@@ -78,10 +71,10 @@ export const fetchParentUsers = createAsyncThunk(
   async (_, thunkAPI) => {
     const response = await axios.get(
       `${BASEURL}/api/parent-users`,
-      getAuthHeaders(thunkAPI)
+      getAuthHeaders(thunkAPI),
     );
     return response.data.parentUser;
-  }
+  },
 );
 
 // Async thunk for inActiveUser a user
@@ -91,14 +84,14 @@ export const inActiveUser = createAsyncThunk(
     try {
       const res = await axios.delete(
         `${BASEURL}/api/delete-user/${id}`,
-        getAuthHeaders(thunkAPI) // Ensure headers are passed correctly
+        getAuthHeaders(thunkAPI), // Ensure headers are passed correctly
       );
       return res.data;
     } catch (error) {
       // Reject with value if the request fails
       return thunkAPI.rejectWithValue("Failed to delete user.");
     }
-  }
+  },
 );
 
 // Async thunk for updating user data (used in EditUser)
@@ -110,13 +103,13 @@ export const updateUser = createAsyncThunk(
       const response = await axios.put(
         `${BASEURL}/api/edit-user/${id}`,
         formData,
-        getAuthHeaders(thunkAPI)
+        getAuthHeaders(thunkAPI),
       );
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue("Failed to update user."); // Use rejectWithValue from thunkAPI
     }
-  }
+  },
 );
 
 // Async thunk for creating a new user
@@ -127,15 +120,15 @@ export const createUser = createAsyncThunk(
       const response = await axios.post(
         `${BASEURL}/api/register`, // make sure BASEURL is defined
         formData,
-        getAuthHeaders(thunkAPI)
+        getAuthHeaders(thunkAPI),
       );
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to create User."
-      ); 
+        error.response?.data?.message || "Failed to create User.",
+      );
     }
-  }
+  },
 );
 
 export const changePassword = createAsyncThunk(
@@ -149,15 +142,15 @@ export const changePassword = createAsyncThunk(
           oldPassword,
           newPassword,
         },
-        getAuthHeaders(thunkAPI)
+        getAuthHeaders(thunkAPI),
       );
       return response.data; // Return response to store
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to change password."
+        error.response?.data?.message || "Failed to change password.",
       );
     }
-  }
+  },
 );
 
 export const handleForgotPassword = createAsyncThunk(
@@ -169,17 +162,17 @@ export const handleForgotPassword = createAsyncThunk(
         {
           email,
           newPassword,
-          otp
+          otp,
         },
-        getAuthHeaders(thunkAPI)
+        getAuthHeaders(thunkAPI),
       );
       return response.data; // Return response to store
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to change password."
+        error.response?.data?.message || "Failed to change password.",
       );
     }
-  }
+  },
 );
 
 export const logoutUser = createAsyncThunk(
@@ -190,10 +183,10 @@ export const logoutUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Logout failed"
+        error.response?.data?.message || "Logout failed",
       );
     }
-  }
+  },
 );
 
 export const sendOTP = createAsyncThunk(
@@ -202,15 +195,15 @@ export const sendOTP = createAsyncThunk(
     try {
       await axios.post(
         `${BASEURL}/api/send-otp`,
-        { email},
-        getAuthHeaders(thunkAPI)
+        { email },
+        getAuthHeaders(thunkAPI),
       );
       return { email };
     } catch (error) {
       console.error("OTP send failed", error);
       return thunkAPI.rejectWithValue("Failed to send OTP");
     }
-  }
+  },
 );
 export const resendOTP = createAsyncThunk(
   "ticket/resendOTP",
@@ -218,15 +211,15 @@ export const resendOTP = createAsyncThunk(
     try {
       await axios.post(
         `${BASEURL}/api/resend-otp`,
-        { email},
-        getAuthHeaders(thunkAPI)
+        { email },
+        getAuthHeaders(thunkAPI),
       );
       return { email };
     } catch (error) {
       console.error("OTP re-send failed", error);
       return thunkAPI.rejectWithValue("Failed to re-send OTP");
     }
-  }
+  },
 );
 export const verifyOTP = createAsyncThunk(
   "ticket/verifyOTP",
@@ -234,13 +227,117 @@ export const verifyOTP = createAsyncThunk(
     try {
       await axios.post(
         `${BASEURL}/api/verify-otp`,
-        { email, otp},
-        getAuthHeaders(thunkAPI)
+        { email, otp },
+        getAuthHeaders(thunkAPI),
       );
       return { email };
     } catch (error) {
       console.error("Failed to verify OTP", error);
-      return thunkAPI.rejectWithValue("Failed to verify OTP");
+      return thunkAPI.rejectWithValue(
+        error.response.data.message || "Failed to verify otp",
+      );
     }
-  }
+  },
+);
+
+export const sendPhoneOTP = createAsyncThunk(
+  "ticket/sendPhoneOTP",
+  async ({ phoneNumber }, thunkAPI) => {
+    try {
+      await axios.post(
+        `${BASEURL}/api/send-phone-otp`,
+        { phoneNumber },
+        getAuthHeaders(thunkAPI),
+      );
+      return { phoneNumber };
+    } catch (error) {
+      console.error("OTP send failed", error);
+      return thunkAPI.rejectWithValue("Failed to send OTP");
+    }
+  },
+);
+export const resendPhoneOTP = createAsyncThunk(
+  "ticket/resendPhoneOTP",
+  async ({ phoneNumber }, thunkAPI) => {
+    try {
+      await axios.post(
+        `${BASEURL}/api/resend-phone-otp`,
+        { phoneNumber },
+        getAuthHeaders(thunkAPI),
+      );
+      return { phoneNumber };
+    } catch (error) {
+      console.error("OTP re-send failed", error);
+      return thunkAPI.rejectWithValue("Failed to re-send OTP");
+    }
+  },
+);
+export const verifyPhoneOTP = createAsyncThunk(
+  "ticket/verifyPhoneOTP",
+  async ({ phoneNumber, otp }, thunkAPI) => {
+    try {
+      await axios.post(
+        `${BASEURL}/api/verify-phone-otp`,
+        { phoneNumber, otp },
+        getAuthHeaders(thunkAPI),
+      );
+      return { phoneNumber };
+    } catch (error) {
+      console.error("Failed to verify OTP", error);
+      return thunkAPI.rejectWithValue(
+        error.response.data.message || "Failed to verify OTP",
+      );
+    }
+  },
+);
+
+export const sendUserOTP = createAsyncThunk(
+  "ticket/sendUserOTP",
+  async ({ email }, thunkAPI) => {
+    try {
+      await axios.post(
+        `${BASEURL}/api/send-user-otp`,
+        { email },
+        getAuthHeaders(thunkAPI),
+      );
+      return { email };
+    } catch (error) {
+      console.error("OTP send failed", error);
+      return thunkAPI.rejectWithValue("Failed to send OTP");
+    }
+  },
+);
+export const resendUserOTP = createAsyncThunk(
+  "ticket/resendUserOTP",
+  async ({ email }, thunkAPI) => {
+    try {
+      await axios.post(
+        `${BASEURL}/api/resend-user-otp`,
+        { email },
+        getAuthHeaders(thunkAPI),
+      );
+      return { email };
+    } catch (error) {
+      console.error("OTP re-send failed", error);
+      return thunkAPI.rejectWithValue("Failed to re-send OTP");
+    }
+  },
+);
+export const verifyUserOTP = createAsyncThunk(
+  "ticket/verifyUserOTP",
+  async ({ email, otp }, thunkAPI) => {
+    try {
+      await axios.post(
+        `${BASEURL}/api/verify-user-otp`,
+        { email, otp },
+        getAuthHeaders(thunkAPI),
+      );
+      return { email };
+    } catch (error) {
+      console.error("Failed to verify OTP", error);
+      return thunkAPI.rejectWithValue(
+        error.response.data.message || "Failed to verify OTP",
+      );
+    }
+  },
 );

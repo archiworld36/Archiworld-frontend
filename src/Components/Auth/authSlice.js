@@ -14,6 +14,12 @@ import {
   verifyOTP,
   fetchUserById,
   handleForgotPassword,
+  sendPhoneOTP,
+  resendPhoneOTP,
+  verifyPhoneOTP,
+  sendUserOTP,
+  resendUserOTP,
+  verifyUserOTP,
 } from "./authAPI";
 
 export const authSliceInitialState = {
@@ -200,6 +206,65 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(verifyOTP.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      //send otp
+      .addCase(sendPhoneOTP.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(sendPhoneOTP.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(sendPhoneOTP.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      //resend otp
+      .addCase(resendPhoneOTP.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(resendPhoneOTP.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(resendPhoneOTP.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      //verify otp
+      .addCase(verifyPhoneOTP.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(verifyPhoneOTP.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(verifyPhoneOTP.rejected, (state, action) => {
+        state.error = action.payload;
+      }) //send otp
+      .addCase(sendUserOTP.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(sendUserOTP.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(sendUserOTP.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      //resend otp
+      .addCase(resendUserOTP.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(resendUserOTP.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(resendUserOTP.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      //verify otp
+      .addCase(verifyUserOTP.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(verifyUserOTP.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(verifyUserOTP.rejected, (state, action) => {
         state.error = action.payload;
       })
       // Update user
