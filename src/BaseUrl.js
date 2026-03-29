@@ -1,2 +1,2 @@
-const BASEURL = "http://localhost:5001";
+const BASEURL = "https://api.archiworld.in";
 export default BASEURL;
