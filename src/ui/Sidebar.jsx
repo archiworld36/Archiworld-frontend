@@ -58,7 +58,7 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
       href={href}
       onClick={handleNavClick}
       className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-        active ? "text-white bg-black" : "text-gray-300 hover:text-white"
+        active ? "text-white bg-[hsl(221,39%,38%)]" : "text-gray-300 hover:text-white"
       }`}
     >
       {icon}
@@ -92,7 +92,7 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
 
   return (
     <div
-      className={`h-full bg-black bg-opacity-90 text-white w-64 flex-shrink-0 fixed inset-y-0 left-0 z-30 transform transition-transform duration-200 ease-in-out 
+      className={`h-full  bg-gradient-to-br from-[hsl(221,41%,12%)] via-[hsl(223,57%,25%)] to-[hsl(271,38%,23%)] text-white w-64 flex-shrink-0 fixed inset-y-0 left-0 z-30 transform transition-transform duration-200 ease-in-out 
         lg:translate-x-0 lg:relative  ${
           isExpanded ? "translate-x-0" : "-translate-x-full"
         }`}

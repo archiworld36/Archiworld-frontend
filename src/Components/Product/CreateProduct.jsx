@@ -57,7 +57,7 @@ export default function CreateProductForm() {
     brand: null,
     material: null,
     color: [],
-    size: { length: "", width: "", height: "", weight: "" },
+    size: { length: "", width: "", height: ""},
     price: { min: "", max: "" },
     features: [],
     featuredProduct: false,
@@ -80,7 +80,7 @@ export default function CreateProductForm() {
         brand: null,
         material: null,
         color: [],
-        size: { length: "", width: "", height: "", weight: "" },
+        size: { length: "", width: "", height: "" },
         price: { min: "", max: "" },
         features: [],
         featuredProduct: false,
@@ -106,7 +106,6 @@ export default function CreateProductForm() {
           length: productById.size?.length || "",
           width: productById.size?.width || "",
           height: productById.size?.height || "",
-          weight: productById.size?.weight || "",
         },
         price: {
           min: productById.price?.min || "",
@@ -171,8 +170,8 @@ export default function CreateProductForm() {
     }
 
     // Size validation
-    const { length, width, height, weight } = formData.size;
-    if (!length || !width || !height || !weight) {
+    const { length, width, height } = formData.size;
+    if (!length || !width || !height) {
       toast.error("Please fill all size fields");
       setIsSaving(false);
       return;
@@ -306,7 +305,7 @@ export default function CreateProductForm() {
             brand: null,
             material: null,
             color: [],
-            size: { length: "", width: "", height: "", weight: "" },
+            size: { length: "", width: "", height: ""},
             price: { min: "", max: "" },
             features: [],
             featuredProduct: false,
@@ -550,7 +549,7 @@ export default function CreateProductForm() {
                 Size <span className="text-red-600">*</span>
               </Label>
               <div className="flex flex-col lg:flex-row gap-3 w-full">
-                {["length", "width", "height", "weight"].map((field) => (
+                {["length", "width", "height"].map((field) => (
                   <div key={field} className="w-full flex flex-col gap-1">
                     <Label htmlFor={field} className="px-3 capitalize">
                       {field} <span className="text-red-600">*</span>
@@ -576,7 +575,7 @@ export default function CreateProductForm() {
                         className="pr-12 pl-3 w-full py-1.5 border border-gray-300 rounded-md focus:outline-none shadow-none bg-input"
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[clamp(10px,3vw,40px)] sm:text-[clamp(12px,1.9vw,30px)] lg:text-[clamp(10px,1vw,40px)]">
-                        {field === "weight" ? "Kg" : "cm"}
+                        cm
                       </div>
                     </div>
                   </div>
@@ -713,7 +712,7 @@ export default function CreateProductForm() {
                         }}
                       />
                       <span className="text-xs text-gray-500">
-                        Recommended size: <b>1400 x 1000</b>
+                        Recommended size: <b>1400 x 1400</b>
                       </span>
                     </div>
                     {/* Preview */}
