@@ -455,11 +455,11 @@ export default function CreateUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.emailVerified) {
+    if (!formData.emailVerified && user?.parentId) {
       toast.info("Please verify your email Id");
       return;
     }
-    if (!formData.phoneVerified) {
+    if (!formData.phoneVerified && user?.parentId) {
       toast.info("Please verify your Mobile Number");
       return;
     }
