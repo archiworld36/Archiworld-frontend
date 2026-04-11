@@ -841,6 +841,7 @@ export default function CreateUser() {
                     onChange={(e) => handleCategorySelect(e.value)}
                     checkmark
                     showSelectAll
+                    filter
                     selectAllLabel="Select All"
                     maxSelectedLabels={3}
                     className="w-full px-1 text-sm border border-gray-300 rounded-md bg-input shadow-none"
@@ -861,6 +862,7 @@ export default function CreateUser() {
                       }))
                     }
                     checkmark
+                    filter
                     showSelectAll
                     maxSelectedLabels={3}
                     selectAllLabel="Select All"
