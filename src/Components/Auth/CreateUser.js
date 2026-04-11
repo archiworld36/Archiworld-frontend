@@ -1031,14 +1031,14 @@ export default function CreateUser() {
                         onChange={(e) => {
                           const file = e.target.files[0];
                           if (!file) return;
-                          const maxSize = 5 * 1024 * 1024; // 5MB
+                          const maxSize = 10 * 1024 * 1024; // 10MB
                           if (file.type !== "application/pdf") {
                             toast.info("Only PDF files are allowed.");
                             e.target.value = "";
                             return;
                           }
                           if (file.size > maxSize) {
-                            toast.info("File size must be less than 5MB.");
+                            toast.info("File size must be less than 10 MB.");
                             e.target.value = "";
                             return;
                           }
@@ -1050,7 +1050,7 @@ export default function CreateUser() {
                         }}
                       />
                       <span className="text-xs text-gray-500">
-                        Upload PDF (Size max upto 5MB)
+                        Upload PDF (Size max upto 10 MB)
                       </span>
                     </div>
                     {typeof item.pdf === "string" && (
