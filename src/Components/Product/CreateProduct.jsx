@@ -57,7 +57,7 @@ export default function CreateProductForm() {
     brand: null,
     material: null,
     color: [],
-    size: { length: "", width: "", height: ""},
+    size: { length: "", width: "", height: "" },
     price: { min: "", max: "" },
     features: [],
     featuredProduct: false,
@@ -85,7 +85,7 @@ export default function CreateProductForm() {
         features: [],
         featuredProduct: false,
       });
-    } else if (location.startsWith("/edit-product") && productById) {
+    } else if (location.startsWith("/edit-product") && productId) {
       if (productById.category?._id) {
         dispatch(fetchSubCategory(productById.category._id));
       }
@@ -132,7 +132,7 @@ export default function CreateProductForm() {
         })),
       );
     }
-  }, [location, productById, dispatch]);
+  }, [location, productId, productById, dispatch]);
 
   useEffect(() => {
     dispatch(fetchCategory());
@@ -199,14 +199,14 @@ export default function CreateProductForm() {
     }
 
     // Banner validation
-    if (!bannerImage && !productById) {
+    if (!bannerImage && !productId) {
       toast.error("Banner image is required");
       setIsSaving(false);
       return;
     }
 
     // Images validation
-    if (images.length === 0 && !productById) {
+    if (images.length === 0 && !productId) {
       toast.error("Please upload product images");
       setIsSaving(false);
       return;
@@ -272,7 +272,7 @@ export default function CreateProductForm() {
       }
     });
 
-    if (productById.name) {
+    if (productId) {
       try {
         const actionResult = await dispatch(
           updateProduct({ id: productById._id, formData: fd }),
@@ -305,7 +305,7 @@ export default function CreateProductForm() {
             brand: null,
             material: null,
             color: [],
-            size: { length: "", width: "", height: ""},
+            size: { length: "", width: "", height: "" },
             price: { min: "", max: "" },
             features: [],
             featuredProduct: false,
@@ -423,12 +423,12 @@ export default function CreateProductForm() {
         </Button>
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
-            {productById.name
+            {productId
               ? `Edit Product ${productById.name}`
               : "Create New Product"}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            {productById.name
+            {productId
               ? "Edit a Product to your system"
               : "Add a new Product to your inventory"}
           </p>
@@ -438,7 +438,7 @@ export default function CreateProductForm() {
         <CardHeader>
           <CardTitle>Product Information</CardTitle>
           <CardDescription>
-            {productById.name
+            {productId
               ? "Edit the details you want to edit"
               : "Enter the details for the new product"}
           </CardDescription>
@@ -904,10 +904,10 @@ export default function CreateProductForm() {
               )}
               <Button type="submit" disabled={isSaving}>
                 {isSaving
-                  ? productById.name
+                  ? productId
                     ? "Updating..."
                     : "Creating..."
-                  : productById.name
+                  : productId
                     ? "Update Product"
                     : "Create Product"}
               </Button>

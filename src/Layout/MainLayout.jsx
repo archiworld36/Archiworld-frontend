@@ -17,6 +17,9 @@ function MainLayout({ children }) {
     if (location !== "/edit-subscription") {
       localStorage.removeItem("subscriptionPlanToEdit");
     }
+    if (location !== "/edit-product") {
+      localStorage.removeItem("subscriptionPlanToEdit");
+    }
   }, [location]);
 
   if (isLoginRoute) {

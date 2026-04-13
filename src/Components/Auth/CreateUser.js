@@ -170,7 +170,7 @@ export default function CreateUser() {
         category: [],
         subCategories: [],
       });
-    } else if (location.startsWith("/edit-user") && userById.name) {
+    } else if (location.startsWith("/edit-user") && userId) {
       const stateObj = State.getStatesOfCountry("IN").find(
         (s) => s.name === userById.state,
       );
@@ -219,10 +219,10 @@ export default function CreateUser() {
         })),
       );
     }
-  }, [location, userById]);
+  }, [location, userById, userId]);
 
   useEffect(() => {
-    if (userById.name && userById.category?.length) {
+    if (userId && userById.category?.length) {
       (async () => {
         const subCats = await fetchSubCategoriesForCategories(
           userById.category,
@@ -235,7 +235,7 @@ export default function CreateUser() {
         }));
       })();
     }
-  }, [userById, categories, fetchSubCategoriesForCategories]);
+  }, [userId, userById, categories, fetchSubCategoriesForCategories]);
 
   const handleOnChange = (key, value) => {
     setFormData((prev) => ({
@@ -522,7 +522,7 @@ export default function CreateUser() {
       }
     });
 
-    if (userById.name) {
+    if (userId) {
       formDataToSend.delete("password");
       dispatch(
         updateUser({
@@ -627,12 +627,12 @@ export default function CreateUser() {
         </Button>
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
-            {userById.name
+            {userId
               ? `Edit Profile ${userById.name}`
               : "Create New User"}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            {userById.name
+            {userId
               ? "Edit a User to your system"
               : "Add a new User to your system under you"}
           </p>
@@ -642,7 +642,7 @@ export default function CreateUser() {
         <CardHeader>
           <CardTitle>User Information</CardTitle>
           <CardDescription>
-            {userById.name
+            {userId
               ? "Edit the details you want to edit"
               : "Enter the details for the new user"}
           </CardDescription>
@@ -870,7 +870,7 @@ export default function CreateUser() {
                   />
                 </div>
               </div>
-              {!userById.name && (
+              {!userId && (
                 <div className="flex flex-col gap-1">
                   <Label htmlFor="password" className="px-3">
                     Password <span className="text-red-600">*</span>
@@ -1143,10 +1143,10 @@ export default function CreateUser() {
             <div className="w-fit flex flex-col lg:flex-row gap-5 items-center">
               <Button type="submit" disabled={isSaving}>
                 {isSaving
-                  ? userById.name
+                  ? userId
                     ? "Updating..."
                     : "Creating..."
-                  : userById.name
+                  : userId
                     ? "Update User"
                     : "Create User"}
               </Button>
