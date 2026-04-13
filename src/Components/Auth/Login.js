@@ -188,7 +188,7 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center bg-white h-fit w-72 py-1.5 px-3 rounded-2xl mb-3 shadow-[0_8px_32px_hsl(220,90%,56%,0.3)] animate-[float_2s_ease-in-out_infinite]">
-            <img src={logo} alt="" className="h-fit w-fit" />
+            <img src={logo} alt="" className="h-26 w-fit" />
           </div>
           <h1
             className="text-3xl font-extrabold text-white tracking-tight"
