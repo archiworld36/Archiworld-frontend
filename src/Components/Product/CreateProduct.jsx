@@ -720,7 +720,7 @@ export default function CreateProductForm() {
                       <img
                         src={imageSrc}
                         alt="product"
-                        className="w-32 aspect-[1.4/1] object-cover rounded border"
+                        className="w-32 aspect-[1/1] object-cover rounded border"
                       />
                     )}
                     {/* Delete */}
@@ -752,7 +752,7 @@ export default function CreateProductForm() {
             </div>
             {/* Catalogues */}
             <div className="w-full px-3 flex items-start justify-center flex-col gap-3">
-              <Label>Catalogues</Label>
+              <Label>Technical Details</Label>
               {catalogues.map((item, idx) => (
                 <div key={idx} className="flex gap-3 flex-wrap">
                   {/* Dropdown Type */}
