@@ -16,9 +16,14 @@ h2 {
 input[type="number"] {
   --moz-appearance: textfield;
 }
+
+input[type="checkbox"] {
+  accent-color: black;
+}
 .p-checkbox .p-checkbox-box {
   border: 1px solid #d1d5db !important;
 }
+
 /* Remove shadow from filter input */
 .no-shadow-panel .p-multiselect-filter-container input {
   box-shadow: none !important;
@@ -34,6 +39,24 @@ input[type="number"] {
 .no-shadow-panel .p-checkbox-box {
   border: 1px solid #d1d5db; /* custom border color */
   border-radius: 2px; /* adjust roundness */
+}
+
+.p-slider {
+  background: rgba(74, 74, 74, 0.2);
+  height: 4px;
+}
+
+/* Selected Range */
+.p-slider .p-slider-range {
+  background: black; /* selected bar */
+}
+
+/* Slider Thumb (ellipse / handle) */
+.p-slider .p-slider-handle {
+  background: black;
+  width: 18px;
+  height: 18px;
+  margin-top: -10px; /* centers the handle */
 }
 
 /* Optional: change checked state */

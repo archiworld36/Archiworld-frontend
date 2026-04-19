@@ -27,18 +27,36 @@ export const createProduct = createAsyncThunk(
     }
   },
 );
+let cancelToken;
 export const getProductsByUserId = createAsyncThunk(
   "product/getProductsByUserId",
-  async (_, thunkAPI) => {
+  async (payload, thunkAPI) => {
     try {
-      const response = await axios.get(
+      if (cancelToken) {
+        cancelToken.cancel("New request initiated, cancelling previous one");
+      }
+      cancelToken = axios.CancelToken.source();
+
+      const response = await axios.post(
         `${BASEURL}/api/get-products-by-user-id`,
-        getAuthHeaders(thunkAPI),
+        payload,
+        {
+          ...getAuthHeaders(thunkAPI),
+          cancelToken: cancelToken.token,
+        },
       );
-      return response.data.products;
+      return {
+        products: response.data.products,
+        total: response.data.total,
+      };
     } catch (error) {
+      // 🚀 Ignore cancelled requests
+      if (axios.isCancel(error)) {
+        return thunkAPI.rejectWithValue("REQUEST_CANCELLED");
+      }
+
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Failed to fetch product details",
+        error.response?.data?.message || "Failed to fetch products.",
       );
     }
   },

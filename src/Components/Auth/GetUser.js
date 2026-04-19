@@ -159,7 +159,9 @@ export default function GetUser() {
                     <TableHead className="w-[20%]">Mobile</TableHead>
                     <TableHead className="w-[15%]">User Name</TableHead>
                     <TableHead className="w-[15%]">Address</TableHead>
-                    <TableHead className="w-[15%]">Rating</TableHead>
+                    {user.parentId === null && (
+                      <TableHead className="w-[15%]">Rating</TableHead>
+                    )}
                     <TableHead className="text-right w-[10%]">
                       Actions
                     </TableHead>
@@ -174,7 +176,9 @@ export default function GetUser() {
                       <TableCell>{item.mobile}</TableCell>
                       <TableCell>{item.username}</TableCell>
                       <TableCell>{item?.address}</TableCell>
-                      <TableCell>{item?.subscription?.name}</TableCell>
+                      {user.parentId === null && (
+                        <TableCell>{item?.subscription?.name}</TableCell>
+                      )}
                       <TableCell className="text-right flex justify-end">
                         <Button
                           variant="ghost"

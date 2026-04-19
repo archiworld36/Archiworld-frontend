@@ -10,6 +10,7 @@ import {
 
 export const productInitialState = {
   products: [],
+  total: 0,
   productById: [],
   loading: false,
   error: false,
@@ -30,9 +31,11 @@ const productSlice = createSlice({
       })
       .addCase(getProductsByUserId.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload; // Set the list of products
+        state.products = action.payload.products;
+        state.total = action.payload.total;
       })
       .addCase(getProductsByUserId.rejected, (state, action) => {
+        if (action.payload === "REQUEST_CANCELLED") return;
         state.loading = false;
         state.error = action.error.message;
       })

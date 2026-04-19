@@ -40,7 +40,7 @@ export default function SubCategoryManagement() {
   const { categoryId, name } = useParams();
   const {
     subCategories = [],
-    loading,
+    loadingSubCategories,
     error,
   } = useSelector((state) => state.category);
   const [isAdding, setIsAdding] = useState(false);
@@ -162,7 +162,7 @@ export default function SubCategoryManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loadingSubCategories ? (
             <div className="w-full text-center py-10">
               <p className="mt-2 text-sm text-gray-600">
                 Loading sub-categories...

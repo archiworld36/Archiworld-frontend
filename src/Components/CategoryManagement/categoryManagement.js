@@ -40,7 +40,7 @@ export default function CategoryManagement() {
   const {
     categories = [],
     error,
-    loading,
+    loadingCategories,
   } = useSelector((state) => state.category);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -173,7 +173,7 @@ export default function CategoryManagement() {
         </CardHeader>
 
         <CardContent>
-          {loading ? (
+          {loadingCategories ? (
             <div className="w-full text-center py-10">
               <p className="mt-2 text-sm text-gray-600">
                 Loading categories...

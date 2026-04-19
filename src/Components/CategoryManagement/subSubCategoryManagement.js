@@ -39,10 +39,12 @@ export default function SubSubCategoryManagement() {
   const dispatch = useDispatch();
   const { name, subCategoryId } = useParams();
   const {
-    subSubCategories = [],
-    loading,
+    subSubCategories: subSubCategoriesMap = {},
+    loadingSubSubCategories,
     error,
   } = useSelector((state) => state.category);
+
+  const subSubCategories = subSubCategoriesMap[subCategoryId] || [];
   const [isAdding, setIsAdding] = useState(false);
   const [editingSubSubCategory, setEditingSubSubCategory] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -161,7 +163,7 @@ export default function SubSubCategoryManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loadingSubSubCategories ? (
             <div className="w-full text-center py-10">
               <p className="mt-2 text-sm text-gray-600">
                 Loading sub-sub-categories...

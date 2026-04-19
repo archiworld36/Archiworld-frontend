@@ -509,14 +509,19 @@ export default function CreateUser() {
     if (formData.bannerImage) {
       formDataToSend.append("bannerImage", formData.bannerImage);
     }
-    // Append other fields
     Object.entries(finalFormData).forEach(([key, value]) => {
-      if (value === null || value === undefined) return;
-
       if (key === "profileLogo" || key === "bannerImage") return;
 
+      // ✅ IMPORTANT: send null explicitly
+      if (value === null) {
+        formDataToSend.append(key, "null");
+        return;
+      }
+
+      if (value === undefined) return;
+
       if (Array.isArray(value) || typeof value === "object") {
-        formDataToSend.append(key, JSON.stringify(value)); // ✅ includes subCategories
+        formDataToSend.append(key, JSON.stringify(value));
       } else {
         formDataToSend.append(key, value);
       }
@@ -627,9 +632,7 @@ export default function CreateUser() {
         </Button>
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
-            {userId
-              ? `Edit Profile ${userById.name}`
-              : "Create New User"}
+            {userId ? `Edit Profile ${userById.name}` : "Create New User"}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             {userId
@@ -812,18 +815,23 @@ export default function CreateUser() {
                     className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none shadow-none bg-input"
                   />
                 </div>
-                <div className="w-full flex flex-col gap-1">
-                  <Label className="px-3">Subscription Plan</Label>
-                  <Dropdown
-                    placeholder="Select Subscription Plan"
-                    options={subscriptionOptions}
-                    value={formData.subscription}
-                    onChange={(e) => handleOnChange("subscription", e.value)}
-                    disabled={user?.parentId}
-                    checkmark
-                    className="w-full px-1 text-sm border border-gray-300 rounded-md bg-input shadow-none"
-                  />
-                </div>
+                {user?.parentId === null && (
+                  <div className="w-full flex flex-col gap-1">
+                    <Label className="px-3">Subscription Plan</Label>
+                    <Dropdown
+                      placeholder="Select Subscription Plan"
+                      options={subscriptionOptions}
+                      value={formData.subscription}
+                      showClear={formData.subscription}
+                      onChange={(e) =>
+                        handleOnChange("subscription", e.value ?? null)
+                      }
+                      disabled={user?.parentId}
+                      checkmark
+                      className="w-full px-1 text-sm border border-gray-300 rounded-md bg-input shadow-none"
+                    />
+                  </div>
+                )}
               </div>
               <div className="flex flex-col lg:flex-row gap-3 w-full">
                 <div className="w-full flex flex-col gap-1">

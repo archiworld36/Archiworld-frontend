@@ -18,7 +18,10 @@ import {
 export const initialState = {
   categories: [],
   subCategories: [],
-  subSubCategories: [],
+  subSubCategories: {},
+  loadingCategories: false,
+  loadingSubCategories: false,
+  loadingSubSubCategories: false,
   loading: false,
   error: null,
 };
@@ -31,41 +34,42 @@ const categorySlice = createSlice({
     builder
       // Fetch categories
       .addCase(fetchCategory.pending, (state) => {
-        state.loading = true;
+        state.loadingCategories = true;
         state.error = null;
       })
       .addCase(fetchCategory.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingCategories = false;
         state.categories = action.payload; // Set the list of categories
       })
       .addCase(fetchCategory.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingCategories = false;
         state.error = action.error.message;
       })
       // Fetch sub-categories
       .addCase(fetchSubCategory.pending, (state) => {
-        state.loading = true;
+        state.loadingSubCategories = true;
         state.error = null;
       })
       .addCase(fetchSubCategory.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingSubCategories = false;
         state.subCategories = action.payload; // Set the list of subCategories
       })
       .addCase(fetchSubCategory.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingSubCategories = false;
         state.error = action.error.message;
       })
       // Fetch sub-sub-categories
       .addCase(fetchSubSubCategory.pending, (state) => {
-        state.loading = true;
+        state.loadingSubSubCategories = true;
         state.error = null;
       })
       .addCase(fetchSubSubCategory.fulfilled, (state, action) => {
-        state.loading = false;
-        state.subSubCategories = action.payload; // Set the list of subCategories
+        state.loadingSubSubCategories = false;
+        const { subCategoryId, data } = action.payload;
+        state.subSubCategories[subCategoryId] = data;
       })
       .addCase(fetchSubSubCategory.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingSubSubCategories = false;
         state.error = action.error.message;
       })
       // Create new category
