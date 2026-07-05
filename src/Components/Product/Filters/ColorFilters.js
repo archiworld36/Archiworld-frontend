@@ -12,6 +12,11 @@ function ColorFilters({ selectedColors, setSelectedColors }) {
     { code: "FFF70B", name: "Yellow" },
     { code: "808080", name: "Gray" },
     { code: "FF0000", name: "Red" },
+    { code: "6A5383", name: "Purple" },
+    { code: "895129", name: "Brown" },
+    { code: "EDE8D0", name: "Cream" },
+    { code: "E9D491", name: "Gold" },
+    { code: "CF8F5F", name: "Copper" },
   ];
 
   const handleColorsChange = (colorName) => {

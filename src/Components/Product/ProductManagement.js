@@ -26,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../ui/dialog";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearchParams } from "wouter";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { Paginator } from "primereact/paginator";
@@ -61,26 +61,64 @@ export default function ProductManagement() {
     error,
   } = useSelector((state) => state.product);
   const { user } = useSelector((state) => state.auth);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-  const debounceTimeout = useRef(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rows, setRows] = useState(24);
   const [locationArea, setLocationArea] = useState([]);
-  const [selectedLocations, setSelectedLocations] = useState([]);
-  const [selectedSubCategories, setSelectedSubCategories] = useState([]);
-  const [selectedSubSubCategories, setSelectedSubSubCategories] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
-  const [selectedMaterial, setSelectedMaterial] = useState([]);
-  const [selectedBrand, setSelectedBrand] = useState([]);
-  const [lengthRange, setLengthRange] = useState([0, 200]);
-  const [widthRange, setWidthRange] = useState([0, 200]);
-  const [heightRange, setHeightRange] = useState([0, 200]);
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
-  const [featuredProduct, setFeaturedProduct] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [, navigate] = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const getArrayParam = (key) =>
+    searchParams.get(key)?.split(",").filter(Boolean) || [];
+
+  const getRangeParam = (key, defaultValue) => {
+    const value = searchParams.get(key);
+    if (!value) return defaultValue;
+
+    const [min, max] = value.split("-").map(Number);
+    return [min, max];
+  };
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || "",
+  );
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 0,
+  );
+  const [rows, setRows] = useState(Number(searchParams.get("rows")) || 24);
+
+  const [selectedLocations, setSelectedLocations] = useState(
+    getArrayParam("locations"),
+  );
+  const [selectedSubCategories, setSelectedSubCategories] = useState(
+    getArrayParam("subCategories"),
+  );
+  const [selectedSubSubCategories, setSelectedSubSubCategories] = useState(
+    getArrayParam("subSubCategories"),
+  );
+  const [selectedColors, setSelectedColors] = useState(getArrayParam("colors"));
+  const [selectedMaterial, setSelectedMaterial] = useState(
+    getArrayParam("materials"),
+  );
+  const [selectedBrand, setSelectedBrand] = useState(getArrayParam("brands"));
+
+  const [lengthRange, setLengthRange] = useState(
+    getRangeParam("length", [0, 200]),
+  );
+  const [widthRange, setWidthRange] = useState(
+    getRangeParam("width", [0, 200]),
+  );
+  const [heightRange, setHeightRange] = useState(
+    getRangeParam("height", [0, 200]),
+  );
+  const [priceRange, setPriceRange] = useState(
+    getRangeParam("price", [0, 1000000]),
+  );
+
+  const [featuredProduct, setFeaturedProduct] = useState(
+    searchParams.get("featuredProduct") === "true",
+  );
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const debounceTimeout = useRef(null);
+  const isFirstPageReset = useRef(true);
 
   // Update debouncedSearchTerm with a delay
   useEffect(() => {
@@ -109,8 +147,61 @@ export default function ProductManagement() {
   }, [fetchBrandOptionsOnce, fetchCategoriesOnce, fetchMaterialOptionsOnce]);
 
   useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchTerm) params.set("search", searchTerm);
+    if (currentPage > 0) params.set("page", currentPage);
+    if (rows !== 24) params.set("rows", rows);
+
+    const setArray = (key, value) => {
+      if (value?.length) params.set(key, value.join(","));
+    };
+
+    setArray("locations", selectedLocations);
+    setArray("subCategories", selectedSubCategories);
+    setArray("subSubCategories", selectedSubSubCategories);
+    setArray("colors", selectedColors);
+    setArray("materials", selectedMaterial);
+    setArray("brands", selectedBrand);
+
+    const setRange = (key, value, defaultValue) => {
+      if (value[0] !== defaultValue[0] || value[1] !== defaultValue[1]) {
+        params.set(key, `${value[0]}-${value[1]}`);
+      }
+    };
+
+    setRange("length", lengthRange, [0, 200]);
+    setRange("width", widthRange, [0, 200]);
+    setRange("height", heightRange, [0, 200]);
+    setRange("price", priceRange, [0, 1000000]);
+
+    if (featuredProduct) params.set("featuredProduct", "true");
+
+    const query = params.toString();
+    navigate(query ? `/product-management?${query}` : "/product-management", {
+      replace: true,
+    });
+  }, [
+    searchTerm,
+    currentPage,
+    rows,
+    selectedLocations,
+    selectedSubCategories,
+    selectedSubSubCategories,
+    selectedColors,
+    selectedMaterial,
+    selectedBrand,
+    lengthRange,
+    widthRange,
+    heightRange,
+    priceRange,
+    featuredProduct,
+    navigate,
+  ]);
+
+  useEffect(() => {
     const payload = {
-      page: currentPage,
+      page: currentPage + 1,
       limit: rows,
       search: debouncedSearchTerm,
       locations: selectedLocations,
@@ -159,6 +250,10 @@ export default function ProductManagement() {
   ]);
 
   useEffect(() => {
+    if (isFirstPageReset.current) {
+      isFirstPageReset.current = false;
+      return;
+    }
     setCurrentPage(0);
   }, [
     selectedLocations,
@@ -211,7 +306,6 @@ export default function ProductManagement() {
   };
 
   const handleResetFilters = () => {
-    setLocationArea([]);
     setCurrentPage(0);
     setSelectedLocations([]);
     setSelectedSubCategories([]);
@@ -434,7 +528,7 @@ export default function ProductManagement() {
                 </p>
               </div>
             ) : products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {products.map((item) => (
                   <div
                     key={item._id}

@@ -161,7 +161,9 @@ export const updateSubSubCategory = createAsyncThunk(
         data,
         getAuthHeaders(thunkAPI),
       );
-      return response.data;
+      return {
+        data: response.data.data,
+      };
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Failed to update sub-category.",

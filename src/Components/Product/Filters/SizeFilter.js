@@ -40,7 +40,7 @@ function SizeFilter({
               className="pr-12 pl-5 w-full py-2 border border-[var(--stroke)] rounded-none focus:outline-none shadow-none bg-white"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              cm
+              mm
             </div>
           </div>
           <div>-</div>
@@ -57,7 +57,7 @@ function SizeFilter({
               className="pr-12 pl-5 w-full py-2 border border-[var(--stroke)] rounded-none focus:outline-none shadow-none bg-white"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              cm
+              mm
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ function SizeFilter({
               className="pr-12 pl-5 w-full py-2 border border-[var(--stroke)] rounded-none focus:outline-none shadow-none bg-white"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              cm
+              mm
             </div>
           </div>
           <div>-</div>
@@ -109,7 +109,7 @@ function SizeFilter({
               className="pr-12 pl-5 w-full py-2 border border-[var(--stroke)] rounded-none focus:outline-none shadow-none bg-white"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              cm
+              mm
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ function SizeFilter({
               className="pr-12 pl-5 w-full py-2 border border-[var(--stroke)] rounded-none focus:outline-none shadow-none bg-white"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              cm
+              mm
             </div>
           </div>
           <div>-</div>
@@ -160,7 +160,7 @@ function SizeFilter({
               className="pr-12 pl-5 w-full py-2 border border-[var(--stroke)] rounded-none focus:outline-none shadow-none bg-white"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              cm
+              mm
             </div>
           </div>
         </div>

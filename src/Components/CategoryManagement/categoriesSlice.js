@@ -102,7 +102,16 @@ const categorySlice = createSlice({
       })
       .addCase(createSubSubCategory.fulfilled, (state, action) => {
         state.loading = false;
-        state.subSubCategories.push(action.payload); // Add the new sub-category to the list
+      
+        const newSubSubCategory = action.payload;
+        const subCategoryId = newSubSubCategory.subCategory;
+      
+        state.subSubCategories[subCategoryId] = [
+          ...(state.subSubCategories[subCategoryId] || []),
+          newSubSubCategory,
+        ];
+      
+        state.success = "Sub-Sub-category created successfully.";
       })
       .addCase(createSubSubCategory.rejected, (state, action) => {
         state.loading = false;
@@ -146,12 +155,17 @@ const categorySlice = createSlice({
       })
       .addCase(updateSubSubCategory.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedSubCategory = action.payload.data;
-        state.subSubCategories = state.subSubCategories.map((subSubCat) =>
-          subSubCat._id === updatedSubCategory._id
-            ? updatedSubCategory
-            : subSubCat,
-        );
+      
+        const updatedSubSubCategory = action.payload.data;
+        const subCategoryId = updatedSubSubCategory.subCategory;
+      
+        state.subSubCategories[subCategoryId] =
+          state.subSubCategories[subCategoryId]?.map((subSubCat) =>
+            subSubCat._id === updatedSubSubCategory._id
+              ? updatedSubSubCategory
+              : subSubCat,
+          ) || [];
+      
         state.success = "Sub-Sub-category updated successfully.";
       })
       .addCase(updateSubSubCategory.rejected, (state, action) => {
@@ -200,9 +214,15 @@ const categorySlice = createSlice({
       .addCase(deleteSubSubCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.success = "Sub-Sub-category deleted successfully.";
-        state.subSubCategories = state.subSubCategories.filter(
-          (subSubCat) => subSubCat._id !== action.payload.id,
-        );
+      
+        const { id } = action.payload;
+      
+        Object.keys(state.subSubCategories).forEach((subCategoryId) => {
+          state.subSubCategories[subCategoryId] =
+            state.subSubCategories[subCategoryId].filter(
+              (item) => item._id !== id
+            );
+        });
       })
       .addCase(deleteSubSubCategory.rejected, (state, action) => {
         state.loading = false;

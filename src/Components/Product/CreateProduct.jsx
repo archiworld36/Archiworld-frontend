@@ -24,7 +24,7 @@ import {
 } from "../CategoryManagement/categoriesAPI";
 import { fetchBrandOptions } from "../BrandOptions/brandOptionsAPI";
 import { fetchMaterialOptions } from "../MaterialOptions/materialOptionsAPI";
-import { Link, useLocation, useParams } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { Checkbox } from "primereact/checkbox";
 
 export default function CreateProductForm() {
@@ -33,6 +33,7 @@ export default function CreateProductForm() {
   const { productById, loadingProductFetch, errorProductFetch } = useSelector(
     (state) => state.product,
   );
+
   const { user } = useSelector((state) => state.auth);
   const fetchProductDetails = useCallback(() => {
     dispatch(fetchProductById(productId));
@@ -41,7 +42,7 @@ export default function CreateProductForm() {
   useEffect(() => {
     if (productId) fetchProductDetails();
   }, [fetchProductDetails, productId]);
-  const [location, navigate] = useLocation();
+  const [location] = useLocation();
   const { categories, subCategories, subSubCategories } = useSelector(
     (s) => s.category,
   );
@@ -58,7 +59,10 @@ export default function CreateProductForm() {
     material: null,
     color: [],
     size: { length: "", width: "", height: "" },
+    showSize: true,
+    showColor: true,
     price: { min: "", max: "" },
+    priceUnit: "",
     features: [],
     featuredProduct: false,
   });
@@ -81,7 +85,10 @@ export default function CreateProductForm() {
         material: null,
         color: [],
         size: { length: "", width: "", height: "" },
+        showSize: true,
+        showColor: true,
         price: { min: "", max: "" },
+        priceUnit: "",
         features: [],
         featuredProduct: false,
       });
@@ -107,10 +114,13 @@ export default function CreateProductForm() {
           width: productById.size?.width || "",
           height: productById.size?.height || "",
         },
+        showSize: productById.showSize ?? true,
+        showColor: productById.showColor ?? true,
         price: {
           min: productById.price?.min || "",
           max: productById.price?.max || "",
         },
+        priceUnit: productById?.priceUnit || "",
         features: productById.features?.map((item) => item) || [],
       });
       setCatalogues(
@@ -141,7 +151,13 @@ export default function CreateProductForm() {
   }, [dispatch]);
 
   const handleCategoryChange = (e) => {
-    setFormData({ ...formData, category: e.value, subCategory: null });
+    setFormData({
+      ...formData,
+      category: e.value,
+      subCategory: null,
+      subSubCategory: null,
+    });
+
     dispatch(fetchSubCategory(e.value));
   };
 
@@ -236,7 +252,10 @@ export default function CreateProductForm() {
     fd.append("features", JSON.stringify(featureList));
     fd.append("color", JSON.stringify(formData.color));
     fd.append("size", JSON.stringify(formData.size));
+    fd.append("showSize", JSON.stringify(formData.showSize));
+    fd.append("showColor", JSON.stringify(formData.showColor));
     fd.append("price", JSON.stringify(formData.price));
+    fd.append("priceUnit", formData.priceUnit);
     fd.append("featuredProduct", JSON.stringify(formData.featuredProduct));
 
     fd.append(
@@ -281,7 +300,7 @@ export default function CreateProductForm() {
           toast.error(actionResult.payload || "Something went wrong");
         } else {
           toast.success("Product updated successfully!");
-          navigate("/product-management");
+          window.history.back();
         }
       } catch (error) {
         console.error("Error updating product:", error);
@@ -306,11 +325,14 @@ export default function CreateProductForm() {
             material: null,
             color: [],
             size: { length: "", width: "", height: "" },
+            showSize: true,
+            showColor: true,
             price: { min: "", max: "" },
+            priceUnit: "",
             features: [],
             featuredProduct: false,
           });
-          navigate("/product-management");
+          window.history.back();
         }
       } catch (error) {
         console.error("Error creating product:", error);
@@ -390,6 +412,11 @@ export default function CreateProductForm() {
     { code: "FFF70B", name: "Yellow" },
     { code: "808080", name: "Gray" },
     { code: "FF0000", name: "Red" },
+    { code: "6A5383", name: "Purple" },
+    { code: "895129", name: "Brown" },
+    { code: "EDE8D0", name: "Cream" },
+    { code: "E9D491", name: "Gold" },
+    { code: "CF8F5F", name: "Copper" },
   ];
 
   const catalogueTypes = [
@@ -410,6 +437,11 @@ export default function CreateProductForm() {
       </div>
     );
   };
+
+  const currentSubSubCategories =
+    formData.subCategory && subSubCategories?.[formData.subCategory]
+      ? subSubCategories[formData.subCategory]
+      : [];
   return (
     <div>
       <div className="flex items-center mb-6">
@@ -507,12 +539,12 @@ export default function CreateProductForm() {
                 </div>
               ))}
 
-              {subSubCategories.length > 0 && (
+              {currentSubSubCategories.length > 0 && (
                 <div className="w-full flex flex-col gap-1">
                   <Label className="px-3">Sub-Sub Category</Label>
                   <Dropdown
                     placeholder="Select Sub-Sub Category"
-                    options={subSubCategories.map((o) => ({
+                    options={currentSubSubCategories.map((o) => ({
                       label: o.name,
                       value: o._id,
                     }))}
@@ -541,6 +573,16 @@ export default function CreateProductForm() {
                   showSelectAll
                   selectAllLabel="Select All"
                 />
+                <div className="flex justify-start items-center gap-2 mt-2">
+                  <Checkbox
+                    inputId="showColor"
+                    checked={formData.showColor === true}
+                    onChange={(e) =>
+                      setFormData({ ...formData, showColor: e.checked })
+                    }
+                  />
+                  <Label htmlFor="showColor">Show Color</Label>
+                </div>
               </div>
             </div>
             {/* Size */}
@@ -575,11 +617,21 @@ export default function CreateProductForm() {
                         className="pr-12 pl-3 w-full py-1.5 border border-gray-300 rounded-md focus:outline-none shadow-none bg-input"
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[clamp(10px,3vw,40px)] sm:text-[clamp(12px,1.9vw,30px)] lg:text-[clamp(10px,1vw,40px)]">
-                        cm
+                        mm
                       </div>
                     </div>
                   </div>
                 ))}
+              </div>
+              <div className="flex justify-start items-center gap-2 mt-2">
+                <Checkbox
+                  inputId="showSize"
+                  checked={formData.showSize === true}
+                  onChange={(e) =>
+                    setFormData({ ...formData, showSize: e.checked })
+                  }
+                />
+                <Label htmlFor="showSize">Show Size</Label>
               </div>
             </div>
             {/* Price */}
@@ -619,6 +671,21 @@ export default function CreateProductForm() {
                     </div>
                   </div>
                 ))}
+                <div className="w-full flex flex-col gap-1">
+                  <Label htmlFor="priceUnit" className="px-3">
+                    Price Unit
+                  </Label>
+                  <InputText
+                    value={formData.priceUnit}
+                    onChange={(e) =>
+                      setFormData({ ...formData, priceUnit: e.target.value })
+                    }
+                    placeholder="Per Nos"
+                    name="priceUnit"
+                    id="priceUnit"
+                    className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none shadow-none bg-input"
+                  />
+                </div>
               </div>
             </div>
             {/* Features */}
@@ -879,11 +946,13 @@ export default function CreateProductForm() {
           </CardContent>
 
           <CardFooter className="flex justify-between items-end border-t pt-6">
-            <Link href="/product-management">
-              <Button type="button" variant="outline">
-                Cancel
-              </Button>
-            </Link>
+            <Button
+              onClick={() => window.history.back()}
+              type="button"
+              variant="outline"
+            >
+              Cancel
+            </Button>
             <div className="w-fit flex flex-col lg:flex-row gap-5 items-center">
               {user?.parentId === null && (
                 <div className="flex align-items-center">
